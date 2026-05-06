@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>Workify - Weekly Activity Tracker</title>
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#e94560">
+
+    <!-- iOS PWA Support -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Workify">
+    <link rel="apple-touch-icon" href="icons/icon-180.png">
+
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+</head>
+<body>
+    <!-- Auth Page -->
+    <div class="login-overlay" id="authPage">
+        <div class="login-card">
+            <h1>Workify</h1>
+
+            <!-- Login Form -->
+            <div id="loginSection">
+                <p class="login-subtitle">Sign in to your account</p>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="loginEmail">Email</label>
+                        <input type="email" id="loginEmail" required placeholder="you@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" required placeholder="Enter your password">
+                    </div>
+                    <button type="submit" class="btn-login">Sign In</button>
+                </form>
+                <p class="auth-switch">Don't have an account? <a href="#" id="showSignup">Sign Up</a></p>
+            </div>
+
+            <!-- Signup Form -->
+            <div id="signupSection" style="display:none;">
+                <p class="login-subtitle">Create a new account</p>
+                <form id="signupForm">
+                    <div class="form-group">
+                        <label for="signupEmail">Email</label>
+                        <input type="email" id="signupEmail" required placeholder="you@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="signupPassword">Password</label>
+                        <input type="password" id="signupPassword" required placeholder="Create a password" minlength="4">
+                    </div>
+                    <div class="form-group">
+                        <label for="signupConfirm">Confirm Password</label>
+                        <input type="password" id="signupConfirm" required placeholder="Confirm your password" minlength="4">
+                    </div>
+                    <button type="submit" class="btn-login btn-signup">Sign Up</button>
+                </form>
+                <p class="auth-switch">Already have an account? <a href="#" id="showLogin">Sign In</a></p>
+            </div>
+
+            <p class="login-note">Your data is encrypted locally with your password.</p>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div class="container" id="appContainer" style="display:none;">
+        <h1>Workify</h1>
+        <p class="subtitle">Weekly Activity Tracker</p>
+        <button class="btn-logout" id="logoutBtn">Logout</button>
+        <button class="btn-settings" id="emailSettingsBtn">⚙ Email Settings</button>
+
+        <!-- Data Retention Notification Banner -->
+        <div class="retention-banner" id="retentionBanner" style="display:none;">
+            <div class="retention-content" id="retentionContent"></div>
+            <button class="retention-dismiss" id="dismissBanner">&times;</button>
+        </div>
+
+        <!-- Add Activity Section -->
+        <div class="add-activity-section">
+            <h2>Add Activity for the Week</h2>
+            <form id="addActivityForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="activityName">Activity Name</label>
+                        <input type="text" id="activityName" required placeholder="e.g. Running">
+                    </div>
+                    <div class="form-group">
+                        <label for="activityTarget">Weekly Target</label>
+                        <input type="number" id="activityTarget" required min="1" placeholder="e.g. 5">
+                    </div>
+                </div>
+                <button type="submit" class="btn-add">Add Activity</button>
+            </form>
+        </div>
+
+        <!-- Activities List -->
+        <div class="activities-section">
+            <div class="section-header">
+                <h2>My Activities</h2>
+                <div class="header-buttons">
+                    <button class="btn-summary" id="viewSummaryBtn">Weekly Summary</button>
+                    <button class="btn-summary btn-detailed" id="viewDetailedBtn">Detailed Summary</button>
+                </div>
+            </div>
+            <div id="activitiesList" class="activities-list"></div>
+            <p id="emptyMessage" class="empty-message">No activities added yet. Add one above!</p>
+        </div>
+    </div>
+
+    <!-- Modal for logging activity details -->
+    <div class="modal-overlay" id="logModal">
+        <div class="modal">
+            <h3>Log Activity</h3>
+            <form id="logForm">
+                <div class="form-group">
+                    <label for="logName">With whom?</label>
+                    <input type="text" id="logName" required placeholder="Name of person">
+                </div>
+                <div class="form-group">
+                    <label for="logDescription">Description</label>
+                    <textarea id="logDescription" rows="3" placeholder="Describe the activity..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Date & Time</label>
+                    <input type="text" id="logDate" readonly>
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn-save">Save</button>
+                    <button type="button" class="btn-cancel" id="cancelLog">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for viewing logs -->
+    <div class="modal-overlay" id="logsViewModal">
+        <div class="modal modal-wide">
+            <h3 id="logsTitle">Activity Logs</h3>
+            <div id="logsContent"></div>
+            <button type="button" class="btn-cancel" id="closeLogsView">Close</button>
+        </div>
+    </div>
+
+    <!-- Email Settings Modal -->
+    <div class="modal-overlay" id="emailSettingsModal">
+        <div class="modal">
+            <h3>Email Settings (EmailJS)</h3>
+            <p class="settings-info">To receive real emails, create a free account at <a href="https://www.emailjs.com" target="_blank">emailjs.com</a> and fill in the details below.</p>
+            <form id="emailSettingsForm">
+                <div class="form-group">
+                    <label for="ejsPublicKey">Public Key</label>
+                    <input type="text" id="ejsPublicKey" placeholder="Your EmailJS public key">
+                </div>
+                <div class="form-group">
+                    <label for="ejsServiceId">Service ID</label>
+                    <input type="text" id="ejsServiceId" placeholder="e.g. service_xxxxxx">
+                </div>
+                <div class="form-group">
+                    <label for="ejsTemplateId">Template ID</label>
+                    <input type="text" id="ejsTemplateId" placeholder="e.g. template_xxxxxx">
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn-save">Save Settings</button>
+                    <button type="button" class="btn-cancel" id="cancelEmailSettings">Cancel</button>
+                </div>
+            </form>
+            <div class="settings-help">
+                <strong>Template variables to use in EmailJS template:</strong><br>
+                <code>{{to_email}}</code> — recipient email<br>
+                <code>{{subject}}</code> — email subject<br>
+                <code>{{message}}</code> — email body
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js');
+        }
+    </script>
+</body>
+</html>
