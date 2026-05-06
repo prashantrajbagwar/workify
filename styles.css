@@ -239,6 +239,13 @@ h1 {
     color: #e94560;
 }
 
+.btn-backup {
+    position: static;
+    display: inline-block;
+    margin-top: 10px;
+    margin-right: 8px;
+}
+
 .settings-info {
     font-size: 0.8rem;
     color: #aaa;

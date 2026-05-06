@@ -206,8 +206,18 @@ async function loadAndShow(passphrase) {
     }
     authPage.classList.add('hidden');
     appContainer.style.display = 'block';
+    showStorageInfo();
     await checkDataRetention();
     renderActivities();
+}
+
+function showStorageInfo() {
+    const storageInfo = document.getElementById('storageInfo');
+    const storageKeyDisplay = document.getElementById('storageKeyDisplay');
+    if (storageInfo && storageKeyDisplay) {
+        storageKeyDisplay.textContent = getStorageKey();
+        storageInfo.style.display = 'flex';
+    }
 }
 
 async function saveData() {
@@ -251,9 +261,9 @@ async function checkDataRetention() {
     const now = new Date();
     const currentMonday = getMonday(now);
     const twoWeeksAgo = new Date(currentMonday);
-    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14); // Start of 2 weeks ago
+    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 21); // Start of 3 weeks ago (retain 3 full weeks)
 
-    // Find activities with logs older than 2 full weeks before current week
+    // Find activities with logs older than 3 full weeks before current week
     let hasOldData = false;
     const oldWeeks = new Set();
 
@@ -303,7 +313,7 @@ async function checkDataRetention() {
         sendEmail(
             getUsername(),
             'Workify: Your old activity data will be deleted on ' + retState.scheduledDeletion,
-            'Hi,\n\nThis is a reminder that your Workify activity data from weeks (' + weeks + ') is older than 2 weeks and will be permanently deleted on ' + retState.scheduledDeletion + '.\n\nA second and final reminder will be sent in 2 days.\n\nPlease export any data you wish to keep.\n\n— Workify'
+            'Hi,\n\nThis is a reminder that your Workify activity data from weeks (' + weeks + ') is older than 3 weeks and will be permanently deleted on ' + retState.scheduledDeletion + '.\n\nA second and final reminder will be sent in 2 days.\n\nPlease export any data you wish to keep.\n\n— Workify'
         );
     } else if (!retState.secondWarning) {
         // Check if 2 days have passed since first warning
@@ -362,11 +372,11 @@ function showRetentionBanner(warningNum, retState, oldWeeks) {
     let html = '';
     if (warningNum === 1) {
         html = `<strong>⚠️ Data Retention Warning (Email 1 of 2)</strong><br>
-        You have activity data from old weeks (${weeks}) that exceeds the 2-week retention period.
+        You have activity data from old weeks (${weeks}) that exceeds the 3-week retention period.
         <div class="email-sim">
             <strong>To:</strong> ${getUsername()}<br>
             <strong>Subject:</strong> Your old Workify data will be deleted on ${deleteDate}<br><br>
-            This is a reminder that data older than 2 weeks will be permanently deleted on <strong>${deleteDate}</strong>.
+            This is a reminder that data older than 3 weeks will be permanently deleted on <strong>${deleteDate}</strong>.
             A second reminder will be sent in 2 days.
         </div>`;
     } else {
@@ -458,6 +468,57 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
     loginForm.reset();
     signupForm.reset();
     showAuthSection(loginSection);
+});
+
+// Backup - Export data as encrypted JSON file
+document.getElementById('exportBtn').addEventListener('click', () => {
+    const storageKey = getStorageKey();
+    const data = localStorage.getItem(storageKey);
+    if (!data) {
+        alert('No data to backup.');
+        return;
+    }
+    const backup = {
+        key: storageKey,
+        data: data,
+        exportedAt: new Date().toISOString()
+    };
+    const blob = new Blob([JSON.stringify(backup)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `workify-backup-${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+});
+
+// Restore - Import data from backup file
+document.getElementById('importBtn').addEventListener('click', () => {
+    document.getElementById('importFile').click();
+});
+
+document.getElementById('importFile').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+        const text = await file.text();
+        const backup = JSON.parse(text);
+        if (!backup.data || !backup.key) {
+            alert('Invalid backup file.');
+            return;
+        }
+        if (confirm('This will replace your current data with the backup. Continue?')) {
+            localStorage.setItem(backup.key, backup.data);
+            const passphrase = getPassphrase();
+            if (passphrase) {
+                await loadAndShow(passphrase);
+            }
+            alert('Data restored successfully!');
+        }
+    } catch (err) {
+        alert('Failed to restore: ' + err.message);
+    }
+    e.target.value = '';
 });
 
 // Email Settings

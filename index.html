@@ -72,6 +72,15 @@
         <p class="subtitle">Weekly Activity Tracker</p>
         <button class="btn-logout" id="logoutBtn">Logout</button>
         <button class="btn-settings" id="emailSettingsBtn">⚙ Email Settings</button>
+        <button class="btn-settings btn-backup" id="exportBtn">📥 Backup</button>
+        <button class="btn-settings btn-backup" id="importBtn">📤 Restore</button>
+        <input type="file" id="importFile" accept=".json" style="display:none;">
+
+        <!-- Storage Info Banner -->
+        <div class="storage-info" id="storageInfo" style="display:none;">
+            <span class="storage-icon">💾</span>
+            <span>Your data is saved locally in your browser at key: <code id="storageKeyDisplay"></code> — retained for <strong>3 weeks</strong>.</span>
+        </div>
 
         <!-- Data Retention Notification Banner -->
         <div class="retention-banner" id="retentionBanner" style="display:none;">
