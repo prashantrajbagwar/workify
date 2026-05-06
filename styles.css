@@ -192,58 +192,57 @@ body {
 }
 
 h1 {
-    text-align: center;
     font-size: 2.5rem;
     color: #e94560;
+    margin: 0;
+}
+
+.app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     margin-bottom: 5px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.header-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.btn-header {
+    background: #0f3460;
+    color: #eee;
+    border: 1px solid #0f3460;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+.btn-header:hover {
+    border-color: #e94560;
+    color: #e94560;
+}
+
+.btn-header.btn-logout {
+    background: #555;
+    border-color: #555;
+}
+
+.btn-header.btn-logout:hover {
+    background: #e94560;
+    border-color: #e94560;
+    color: #fff;
 }
 
 .subtitle {
     text-align: center;
     color: #888;
     margin-bottom: 30px;
-}
-
-.btn-logout {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: #555;
-    color: #eee;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 0.85rem;
-}
-
-.btn-logout:hover {
-    background: #e94560;
-}
-
-.btn-settings {
-    position: absolute;
-    top: 20px;
-    right: 110px;
-    background: #0f3460;
-    color: #eee;
-    border: 1px solid #0f3460;
-    padding: 8px 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 0.85rem;
-}
-
-.btn-settings:hover {
-    border-color: #e94560;
-    color: #e94560;
-}
-
-.btn-backup {
-    position: static;
-    display: inline-block;
-    margin-top: 10px;
-    margin-right: 8px;
 }
 
 .settings-info {

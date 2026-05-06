@@ -68,12 +68,16 @@
 
     <!-- Main App -->
     <div class="container" id="appContainer" style="display:none;">
-        <h1>Workify</h1>
+        <div class="app-header">
+            <h1>Workify</h1>
+            <div class="header-actions">
+                <button class="btn-header" id="exportBtn">📥 Backup</button>
+                <button class="btn-header" id="importBtn">📤 Restore</button>
+                <button class="btn-header" id="emailSettingsBtn">⚙ Email</button>
+                <button class="btn-header btn-logout" id="logoutBtn">Logout</button>
+            </div>
+        </div>
         <p class="subtitle">Weekly Activity Tracker</p>
-        <button class="btn-logout" id="logoutBtn">Logout</button>
-        <button class="btn-settings" id="emailSettingsBtn">⚙ Email Settings</button>
-        <button class="btn-settings btn-backup" id="exportBtn">📥 Backup</button>
-        <button class="btn-settings btn-backup" id="importBtn">📤 Restore</button>
         <input type="file" id="importFile" accept=".json" style="display:none;">
 
         <!-- Storage Info Banner -->
