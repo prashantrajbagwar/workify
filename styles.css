@@ -199,10 +199,9 @@ h1 {
 
 .app-header {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
     margin-bottom: 5px;
-    flex-wrap: wrap;
     gap: 10px;
 }
 
@@ -210,6 +209,7 @@ h1 {
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
+    justify-content: center;
 }
 
 .btn-header {
